@@ -6,10 +6,12 @@ def main() -> None:
     nodes, elements = readFile('./gmshSource/newMesh0223_meshsize01')
     print(len(nodes))
     print(len(elements))
+    writeFile('./output/resultfile.dat', nodes, elements)
 
 #読み込み
 def readFile(filename: str) -> Tuple[List[str], List[str]]:
-    f = open(filename)
+    print('start file reading...')
+    f = open(filename, mode='r')
 
     nodes = []
     elements =  []
@@ -62,7 +64,36 @@ def readFile(filename: str) -> Tuple[List[str], List[str]]:
     
     f.close()
 
-    return nodes, elements
+    transferedNodes = []
+    transferedElements = []
+
+    for node in nodes:
+        ret = node.split(' ')
+        x = float(ret[1])
+        y = float(ret[2])
+        z = float(ret[3])
+        transferedNodes.append("{0} {1} {2} {3}\n".format(ret[0],x,y,z))
+    
+    for element in elements:
+        ret = element.split(' ')
+        n1 = int(ret[5])
+        n2 = int(ret[6])
+        n3 = int(ret[7])
+        transferedElements.append("{0} {1} {2} {3} 2 (0.0000000000D+00, 0.0000000000D+00) {4}\n".format(ret[0],n1,n2,n3,ret[4]))
+
+    print('end reading.')
+    return transferedNodes, transferedElements
+
+#writing
+def writeFile(fileName: str, nodes: List[str], elements: List[str]) -> None:
+    print('start file writing...')
+    f = open(fileName, mode='w')
+    f.write('$Nodes:\n')
+    f.writelines(nodes)
+    f.write('$Elements and Boundary Conditions:\n')
+    f.writelines(elements)
+    f.close()
+    print('end writing.')
 
 
 #実行
