@@ -69,17 +69,17 @@ def readFile(filename: str) -> Tuple[List[str], List[str]]:
 
     for node in nodes:
         ret = node.split(' ')
-        x = float(ret[1])
-        y = float(ret[2])
-        z = float(ret[3])
-        transferedNodes.append("{0} {1} {2} {3}\n".format(ret[0],x,y,z))
+        x = '{0:.15f}'.format(float(ret[1])).rjust(18)
+        y = '{0:.15f}'.format(float(ret[2])).rjust(18)
+        z = '{0:.15f}'.format(float(ret[3])).rjust(18)
+        transferedNodes.append("      {0}  {1}D+00  {2}D+00  {3}D+00\n".format(ret[0].rjust(5),x,y,z))
     
     for element in elements:
         ret = element.split(' ')
-        n1 = int(ret[5])
-        n2 = int(ret[6])
-        n3 = int(ret[7])
-        transferedElements.append("{0} {1} {2} {3} 2 (0.0000000000D+00, 0.0000000000D+00) {4}\n".format(ret[0],n1,n2,n3,ret[4]))
+        n1 = ret[5].rjust(5)
+        n2 = ret[6].rjust(5)
+        n3 = ret[7].strip('\n').rjust(5)
+        transferedElements.append("      {0}  {1}    {2}    {3}       2  (   0.000000000000000D+00   0.000000000000000D+00)\n".format(ret[0].rjust(5),n1,n2,n3))
 
     print('end reading.')
     return transferedNodes, transferedElements
@@ -88,10 +88,23 @@ def readFile(filename: str) -> Tuple[List[str], List[str]]:
 def writeFile(fileName: str, nodes: List[str], elements: List[str]) -> None:
     print('start file writing...')
     f = open(fileName, mode='w')
-    f.write('$Nodes:\n')
+    f.write('A Sphere Model for Acoustic Scattering Analysis\n')
+    f.write('  Complete    1      1                ! Job Type (Complete/Field Only/ATM/Use ATM); Solver (1=FMBEM/2=ACA/3=CBEM/4=HFBEM); No. threads\n')
+    f.write('   Full       0      0.d0              ! Problem Space, Symmetry Plane, Symmetry Plane Property (1=Rigid; -1=Soft)\n')
+    f.write('  {0}       {1}     0     0       ! Nos. of Boundary Elements/Nodes, and Nos. of Field Points/Cells, No. of panels\n'.format(str(len(nodes)).rjust(5),str(len(elements)).rjust(5)))
+    f.write('      1       0                       ! No. of plane incident waves, User defined sources (1=Yes/0=No)\n')
+    f.write(' (1., 0.)    -1.     0.      0.       ! Complex amplitude and direction vector of the plane wave(s)\n')
+    f.write('      0       0                       ! No. of monopoles, and No. of dipoles\n')
+    f.write('    343.   1.29  2.d-5  1.d-12    0.  ! cspeed, density, Ref. pressure, Ref. intensity, complex wavenumber k ratio\n')
+    f.write('  54.59   54.59      1       0    0   ! Freq1, Freq2, No. freqs, NOctave, Update BCs for each frequency (1=Yes/0=No)\n')
+    f.write('      0       3      1       0  One   ! Dual BIE (1=Yes/0=No), nruleb (1-6), nrulef (1-6), animation (1=Yes/0=No), Tecplot data (All/One)\n')
+    f.write(' $ Nodes:\n')
     f.writelines(nodes)
-    f.write('$Elements and Boundary Conditions:\n')
+    f.write(' $ Elements and Boundary Conditions:\n')
     f.writelines(elements)
+    f.write(' $ Field Points\n')
+    f.write(' $ Field Cells\n')
+    f.write(' $ End of the File\n')
     f.close()
     print('end writing.')
 
