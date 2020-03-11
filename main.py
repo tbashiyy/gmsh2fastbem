@@ -91,7 +91,7 @@ def writeFile(fileName: str, nodes: List[str], elements: List[str]) -> None:
     f.write('A Sphere Model for Acoustic Scattering Analysis\n')
     f.write('  Complete    1      1                ! Job Type (Complete/Field Only/ATM/Use ATM); Solver (1=FMBEM/2=ACA/3=CBEM/4=HFBEM); No. threads\n')
     f.write('   Full       0      0.d0              ! Problem Space, Symmetry Plane, Symmetry Plane Property (1=Rigid; -1=Soft)\n')
-    f.write('  {0}       {1}     0     0       ! Nos. of Boundary Elements/Nodes, and Nos. of Field Points/Cells, No. of panels\n'.format(str(len(nodes)).rjust(5),str(len(elements)).rjust(5)))
+    f.write('  {0}       {1}     0     0       ! Nos. of Boundary Elements/Nodes, and Nos. of Field Points/Cells, No. of panels\n'.format(str(len(elements)).rjust(5),str(len(nodes)).rjust(5)))
     f.write('      1       0                       ! No. of plane incident waves, User defined sources (1=Yes/0=No)\n')
     f.write(' (1., 0.)    -1.     0.      0.       ! Complex amplitude and direction vector of the plane wave(s)\n')
     f.write('      0       0                       ! No. of monopoles, and No. of dipoles\n')
