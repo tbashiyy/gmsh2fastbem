@@ -3,10 +3,11 @@ from typing import Tuple, List
 
 
 def main() -> None:
-    nodes, elements = readFile('./gmshSource/newMesh0223_meshsize01')
+    fileName = 'sphere_sample'
+    nodes, elements = readFile('./gmshSource/'+fileName)
     print(len(nodes))
     print(len(elements))
-    writeFile('./output/resultfile.dat', nodes, elements)
+    writeFile('./output/'+fileName+'.dat', nodes, elements)
 
 #読み込み
 def readFile(filename: str) -> Tuple[List[str], List[str]]:
@@ -73,13 +74,16 @@ def readFile(filename: str) -> Tuple[List[str], List[str]]:
         y = '{0:.15f}'.format(float(ret[2])).rjust(18)
         z = '{0:.15f}'.format(float(ret[3])).rjust(18)
         transferedNodes.append("      {0}  {1}D+00  {2}D+00  {3}D+00\n".format(ret[0].rjust(5),x,y,z))
-    
+
+    elemCount = 1
     for element in elements:
         ret = element.split(' ')
-        n1 = ret[5].rjust(5)
-        n2 = ret[6].rjust(5)
-        n3 = ret[7].strip('\n').rjust(5)
-        transferedElements.append("      {0}  {1}    {2}    {3}       2  (   0.000000000000000D+00   0.000000000000000D+00)\n".format(ret[0].rjust(5),n1,n2,n3))
+        if(len(ret) == 8):
+            n1 = ret[5].rjust(5)
+            n2 = ret[6].rjust(5)
+            n3 = ret[7].strip('\n').rjust(5)
+            transferedElements.append("      {0}  {1}    {2}    {3}       2  (   0.000000000000000D+00   0.000000000000000D+00)\n".format(str(elemCount).rjust(5),n1,n2,n3))
+            elemCount += 1
 
     print('end reading.')
     return transferedNodes, transferedElements
