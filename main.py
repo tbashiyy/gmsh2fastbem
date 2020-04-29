@@ -24,7 +24,7 @@ def readFile(filename: str) -> Tuple[List[str], List[str]]:
 
     # Nodesまで行を飛ばす
     while line:
-        if (line == '$Nodes\n'):
+        if line == '$Nodes\n':
             line = f.readline()
             nodesLength = int(line)
             break
@@ -36,7 +36,7 @@ def readFile(filename: str) -> Tuple[List[str], List[str]]:
 
     # Nodes読み込み
     while line:
-        if (line == '$EndNodes\n'):
+        if line == '$EndNodes\n':
             line = f.readline()
             break
         else:
@@ -50,45 +50,45 @@ def readFile(filename: str) -> Tuple[List[str], List[str]]:
 
     # Elements読み込み
     while line:
-        if (line == '$EndElements\n'):
+        if line == '$EndElements\n':
             break
         else:
             elements.append(line)
             line = f.readline()
 
     # データ長チェック
-    if (len(nodes) != nodesLength):
+    if len(nodes) != nodesLength:
         raise Exception('Illegal data length')
 
-    if (len(elements) != elementsLength):
+    if len(elements) != elementsLength:
         raise Exception('Illegal data length')
 
     f.close()
 
-    transferedNodes = []
-    transferedElements = []
+    transferredNodes = []
+    transferredElements = []
 
     for node in nodes:
         ret = node.split(' ')
         x = '{0:.15f}'.format(float(ret[1])).rjust(18)
         y = '{0:.15f}'.format(float(ret[2])).rjust(18)
         z = '{0:.15f}'.format(float(ret[3])).rjust(18)
-        transferedNodes.append("      {0}  {1}D+00  {2}D+00  {3}D+00\n".format(ret[0].rjust(5), x, y, z))
+        transferredNodes.append("      {0}  {1}D+00  {2}D+00  {3}D+00\n".format(ret[0].rjust(5), x, y, z))
 
     elemCount = 1
     for element in elements:
         ret = element.split(' ')
-        if (len(ret) == 8):
+        if len(ret) == 8:
             n1 = ret[5].rjust(5)
             n2 = ret[6].rjust(5)
             n3 = ret[7].strip('\n').rjust(5)
-            transferedElements.append(
+            transferredElements.append(
                 "      {0}  {1}    {2}    {3}       2  (   0.000000000000000D+00   0.000000000000000D+00)\n".format(
                     str(elemCount).rjust(5), n1, n2, n3))
             elemCount += 1
 
     print('end reading.')
-    return transferedNodes, transferedElements
+    return transferredNodes, transferredElements
 
 
 # writing
