@@ -14,12 +14,12 @@ def main() -> None:
     field = np.array(fieldPoints)
     pressure = norm(np.array(pressure_scattered), axis=1).reshape(len(pressure_scattered), 1)
 
-    x = field[:, 1]
-    y = field[:, 2]
+    x = field[:, 0]
+    z = field[:, 2]
 
     X = ((x - min(x)) / max((x - min(x))) * 10).round(1).reshape(len(x), 1)
-    Y = ((y - min(y)) / max((y - min(y))) * 10).round(1).reshape(len(y), 1)
-    XYZ = np.concatenate([X, Y, pressure], 1)
+    Z = ((z - min(z)) / max((z - min(z))) * 10).round(1).reshape(len(z), 1)
+    XYZ = np.concatenate([X, Z, pressure], 1)
 
     C = np.empty((11, 11))
     C_p = np.empty((10, 10))
@@ -39,8 +39,10 @@ def main() -> None:
 
 # Filed Pointsをinput.datから取得する。(x,y,z)
 def get_field_cells() -> List[List[float]]:
-    path = 'BemResults/sample/input.dat'
-    with open(path) as f:
+    path = 'BemResults'
+    shape = 'quadrangular_prism'
+    no = '000'
+    with open(path + '/' + shape + '/' + no + "/input.dat") as f:
         lines = f.readlines()
 
     fieldPoints: List[List[float]] = []
@@ -55,15 +57,17 @@ def get_field_cells() -> List[List[float]]:
 
     for line in lines[lineStart:lineEnd]:
         fieldPointData = line.split()
-        print(fieldPointData)
         fieldPoints.append([float(fieldPointData[1]), float(fieldPointData[2]), float(fieldPointData[3])])
 
+    print(fieldPoints)
     return fieldPoints
 
 
 def get_pressure_scattered() -> List[List[float]]:
-    path = 'BemResults/sample/output_result.dat'
-    with open(path) as f:
+    path = 'BemResults'
+    shape = 'quadrangular_prism'
+    no = '000'
+    with open(path + '/' + shape + '/' + no + "/output_result.dat") as f:
         lines = f.readlines()
 
     scatteredPressure: List[List[float]] = []
@@ -78,9 +82,9 @@ def get_pressure_scattered() -> List[List[float]]:
 
     for line in lines[lineStart:lineEnd]:
         splitData = line[99:124].split(',')
-        print(splitData)
         scatteredPressure.append([float(splitData[0]), float(splitData[1])])
 
+    print(scatteredPressure)
     return scatteredPressure
 
 
