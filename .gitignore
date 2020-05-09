@@ -129,6 +129,6 @@ dmypy.json
 .pyre/
 
 # datafolder
-gmshSource/*
-output/*
+/gmshSource/*
+/output/*
 
