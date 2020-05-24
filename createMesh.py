@@ -1,14 +1,14 @@
-import numpy as np
 from typing import Tuple, List
 
 
-def main() -> None:
+def main(x: float, y: float, z: float) -> str:
     dir_name = 'quadrangular_prism'
-    file_name = 'quadrangular_prism_000'
-    nodes, elements = readFile('./gmshSource/' + dir_name + '/' + file_name)
+    file_name = 'quadrangular_prism_({0},{1},{2})'.format(x, y, z)
+    nodes, elements = readFile('./gmshSource/' + dir_name + '/' + dir_name)
     print(len(nodes))
     print(len(elements))
-    writeFile('./output/' + dir_name + '/' + file_name + '.dat', nodes, elements)
+    writeFile('./output/' + dir_name + '/' + file_name + '.dat', nodes, elements, (x, y, z))
+    return file_name
 
 
 # 読み込み
@@ -19,7 +19,6 @@ def readFile(filename: str) -> Tuple[List[str], List[str]]:
     nodes = []
     elements = []
     nodesLength = 0
-    elementsLength = 0
 
     line = f.readline()
 
@@ -93,7 +92,7 @@ def readFile(filename: str) -> Tuple[List[str], List[str]]:
 
 
 # writing
-def writeFile(fileName: str, nodes: List[str], elements: List[str]) -> None:
+def writeFile(fileName: str, nodes: List[str], elements: List[str], offsets: Tuple[float, float, float]) -> None:
     print('start file writing...')
     f = open(fileName, mode='w')
     f.write('A Sphere Model for Acoustic Scattering Analysis\n')
@@ -118,7 +117,7 @@ def writeFile(fileName: str, nodes: List[str], elements: List[str]) -> None:
     f.write(' $ Elements and Boundary Conditions:\n')
     f.writelines(elements)
     f.write(' $ Field Points\n')
-    f.writelines(get_field_points())
+    f.writelines(get_field_points(offsets[0], offsets[1], offsets[2]))
     f.write(' $ Field Cells\n')
     f.writelines(get_field_cells())
     f.write(' $ End of the File\n')
@@ -127,14 +126,15 @@ def writeFile(fileName: str, nodes: List[str], elements: List[str]) -> None:
 
 
 # createField
-def get_field_points() -> List[str]:
-    distance = 0.06
+def get_field_points(offset_x: float, offset_y: float, offset_z: float) -> List[str]:
+    base_distance = 0.06
 
     count = 1
     points = []
+    # オフセットは -5 ~ 0 , 0.1刻み
     for z in range(0, 11):
         for x in range(0, 11):
-            points.append("   {0}          {1:.8f}          {2:.8f}          {3:.8f}\n".format(count, float(x * 0.01), distance, float(z * 0.01)))
+            points.append("   {0}          {1:.8f}          {2:.8f}          {3:.8f}\n".format(count, float((x+offset_x) * 0.01), base_distance + offset_y, float((z+offset_z) * 0.01)))
             count += 1
 
     return points
@@ -154,4 +154,4 @@ def get_field_cells() -> List[str]:
 
 
 # 実行
-main()
+main(0, 0, 0)

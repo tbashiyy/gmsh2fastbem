@@ -41,6 +41,7 @@ def main() -> None:
 def get_field_cells() -> List[List[float]]:
     path = 'BemResults'
     shape = 'quadrangular_prism'
+    # x-off,y-off,z-off 回転は考慮しない
     no = '000'
     with open(path + '/' + shape + '/' + no + "/input.dat") as f:
         lines = f.readlines()
