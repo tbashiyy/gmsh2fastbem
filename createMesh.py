@@ -151,7 +151,3 @@ def get_field_cells() -> List[str]:
         count += 1
 
     return cells
-
-
-# 実行
-main(0, 0, 0)

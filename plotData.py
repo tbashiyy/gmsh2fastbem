@@ -5,9 +5,9 @@ import numpy as np
 from scipy.linalg import norm
 
 
-def main() -> None:
-    fieldPoints = get_field_cells()
-    pressure_scattered = get_pressure_scattered()
+def main(input_path: str, output_path: str) -> None:
+    fieldPoints = get_field_cells(input_path)
+    pressure_scattered = get_pressure_scattered(output_path)
     if len(fieldPoints) != len(pressure_scattered):
         Exception('size is different')
 
@@ -38,12 +38,8 @@ def main() -> None:
 
 
 # Filed Pointsをinput.datから取得する。(x,y,z)
-def get_field_cells() -> List[List[float]]:
-    path = 'BemResults'
-    shape = 'quadrangular_prism'
-    # x-off,y-off,z-off 回転は考慮しない
-    no = '000'
-    with open(path + '/' + shape + '/' + no + "/input.dat") as f:
+def get_field_cells(path: str) -> List[List[float]]:
+    with open(path) as f:
         lines = f.readlines()
 
     fieldPoints: List[List[float]] = []
@@ -64,11 +60,8 @@ def get_field_cells() -> List[List[float]]:
     return fieldPoints
 
 
-def get_pressure_scattered() -> List[List[float]]:
-    path = 'BemResults'
-    shape = 'quadrangular_prism'
-    no = '000'
-    with open(path + '/' + shape + '/' + no + "/output_result.dat") as f:
+def get_pressure_scattered(path: str) -> List[List[float]]:
+    with open(path) as f:
         lines = f.readlines()
 
     scatteredPressure: List[List[float]] = []
@@ -88,5 +81,3 @@ def get_pressure_scattered() -> List[List[float]]:
     print(scatteredPressure)
     return scatteredPressure
 
-
-main()
