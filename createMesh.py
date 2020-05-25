@@ -103,9 +103,10 @@ def writeFile(fileName: str, nodes: List[str], elements: List[str], offsets: Tup
     f.write(
         '  {0}       {1}     121     100       ! Nos. of Boundary Elements/Nodes, and Nos. of Field Points/Cells, No. of panels\n'.format(
             str(len(elements)).rjust(5), str(len(nodes)).rjust(5)))
-    f.write('      1       0                       ! No. of plane incident waves, User defined sources (1=Yes/0=No)\n')
-    f.write(' (1., 0.)    0.     -1.      0.       ! Complex amplitude and direction vector of the plane wave(s)\n')
-    f.write('      0       0                       ! No. of monopoles, and No. of dipoles\n')
+    f.write('      0       0                       ! No. of plane incident waves, User defined sources (1=Yes/0=No)\n')
+    # f.write(' (1., 0.)    0.     -1.      0.       ! Complex amplitude and direction vector of the plane wave(s)\n')
+    f.write('      1       0                       ! No. of monopoles, and No. of dipoles\n')
+    f.write(' (1., 0.)    {0:.2f}     {1:0.2f}      {2:.2f}  ! \n'.format(0.05+offsets[0]*0.01, 0.06+offsets[1]*0.01, 0.05+offsets[2]*0.01))
     f.write(
         '    343.   1.29  2.d-5  1.d-12    0.  ! cspeed, density, Ref. pressure, Ref. intensity, complex wavenumber k ratio\n')
     f.write(
@@ -127,7 +128,7 @@ def writeFile(fileName: str, nodes: List[str], elements: List[str], offsets: Tup
 
 # createField
 def get_field_points(offset_x: float, offset_y: float, offset_z: float) -> List[str]:
-    base_distance = 0.06
+    base_distance = 0.3
 
     count = 1
     points = []

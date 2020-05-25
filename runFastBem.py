@@ -8,11 +8,8 @@ ROOT_DIR = os.path.dirname(__file__)
 
 
 def main(x: float, y: float, z: float) -> None:
-    output_dir = "hoge"
-    fastBem_dir = "../FastBEM_Acoustics/"
     fastBem_input_path = "../FastBEM_Acoustics/input.dat"
     fastBem_exe_path = "C:/Users/tbashiyy/PycharmProjects/FastBem/FastBEM_Acoustics/FastBEM_Acoustics.bat"
-    path = 'BemResults'
     shape = 'quadrangular_prism'
     # x-off,y-off,z-off 回転は考慮しない
     # data作成
@@ -36,4 +33,4 @@ def main(x: float, y: float, z: float) -> None:
         exit(1)
 
 
-main(-2.5, 0, -2.5)
+main(-4, 0, -4)
