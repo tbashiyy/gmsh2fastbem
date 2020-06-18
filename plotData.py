@@ -27,11 +27,12 @@ def main(input_path: str, output_path: str) -> None:
     for point in XYZ:
         C[int(point[0]), int(point[1])] = point[2]
 
-    for i in range(0,10):
+    for i in range(0, 10):
         for j in range(0, 10):
-            C_p[i, j] = np.sqrt(C[i, j]**2 + C[i+1, j]**2 + C[i, j+1]**2 + C[i+1, j+1]**2)*0.5
+            # C_p[z, x]に変換
+            C_p[j, i] = np.sqrt(C[i, j]**2 + C[i+1, j]**2 + C[i, j+1]**2 + C[i+1, j+1]**2)*0.5
 
-    plt.pcolor(C_p)
+    plt.pcolor(C_p, cmap="Blues")
     plt.colorbar()
     plt.show()
     exit(0)

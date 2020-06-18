@@ -1,13 +1,16 @@
 from typing import Tuple, List
 
+# 物体の奥行きを考慮
+base_distance = 0.03
 
-def main(x: float, y: float, z: float) -> str:
+
+def main(x: float, y: float, z: float, monopole: bool) -> str:
     dir_name = 'quadrangular_prism'
     file_name = 'quadrangular_prism_({0},{1},{2})'.format(x, y, z)
     nodes, elements = readFile('./gmshSource/' + dir_name + '/' + dir_name)
     print(len(nodes))
     print(len(elements))
-    writeFile('./output/' + dir_name + '/' + file_name + '.dat', nodes, elements, (x, y, z))
+    writeFile('./output/' + dir_name + '/' + file_name + '.dat', nodes, elements, (x, y, z), monopole)
     return file_name
 
 
@@ -92,9 +95,9 @@ def readFile(filename: str) -> Tuple[List[str], List[str]]:
 
 
 # writing
-def writeFile(fileName: str, nodes: List[str], elements: List[str], offsets: Tuple[float, float, float]) -> None:
+def writeFile(file_name: str, nodes: List[str], elements: List[str], offsets: Tuple[float, float, float], monopole: bool) -> None:
     print('start file writing...')
-    f = open(fileName, mode='w')
+    f = open(file_name, mode='w')
     f.write('A Sphere Model for Acoustic Scattering Analysis\n')
     f.write(
         '  Complete    1      1                ! Job Type (Complete/Field Only/ATM/Use ATM); Solver (1=FMBEM/2=ACA/3=CBEM/4=HFBEM); No. threads\n')
@@ -103,10 +106,14 @@ def writeFile(fileName: str, nodes: List[str], elements: List[str], offsets: Tup
     f.write(
         '  {0}       {1}     121     100       ! Nos. of Boundary Elements/Nodes, and Nos. of Field Points/Cells, No. of panels\n'.format(
             str(len(elements)).rjust(5), str(len(nodes)).rjust(5)))
-    f.write('      0       0                       ! No. of plane incident waves, User defined sources (1=Yes/0=No)\n')
-    # f.write(' (1., 0.)    0.     -1.      0.       ! Complex amplitude and direction vector of the plane wave(s)\n')
-    f.write('      1       0                       ! No. of monopoles, and No. of dipoles\n')
-    f.write(' (1., 0.)    {0:.2f}     {1:0.2f}      {2:.2f}  ! \n'.format(0.05+offsets[0]*0.01, 0.06+offsets[1]*0.01, 0.05+offsets[2]*0.01))
+    if monopole:
+        f.write('      0       0                       ! No. of plane incident waves, User defined sources (1=Yes/0=No)\n')
+        f.write('      1       0                       ! No. of monopoles, and No. of dipoles\n')
+        f.write(' (1., 0.)    {0:.3f}     {1:.3f}      {2:.3f}  ! \n'.format(0.05 - offsets[0]*0.01, base_distance+offsets[1]*0.01, 0.05 - offsets[2]*0.01))
+    else:
+        f.write('      1       0                       ! No. of plane incident waves, User defined sources (1=Yes/0=No)\n')
+        f.write(' (1., 0.)    0.     -1.      0.       ! Complex amplitude and direction vector of the plane wave(s)\n')
+        f.write('      0       0                       ! No. of monopoles, and No. of dipoles\n')
     f.write(
         '    343.   1.29  2.d-5  1.d-12    0.  ! cspeed, density, Ref. pressure, Ref. intensity, complex wavenumber k ratio\n')
     f.write(
@@ -128,14 +135,13 @@ def writeFile(fileName: str, nodes: List[str], elements: List[str], offsets: Tup
 
 # createField
 def get_field_points(offset_x: float, offset_y: float, offset_z: float) -> List[str]:
-    base_distance = 0.3
 
     count = 1
     points = []
     # オフセットは -5 ~ 0 , 0.1刻み
     for z in range(0, 11):
         for x in range(0, 11):
-            points.append("   {0}          {1:.8f}          {2:.8f}          {3:.8f}\n".format(count, float((x+offset_x) * 0.01), base_distance + offset_y, float((z+offset_z) * 0.01)))
+            points.append("   {0}          {1:.8f}          {2:.8f}          {3:.8f}\n".format(count, float((x-offset_x) * 0.01), base_distance + offset_y * 0.01, float((z-offset_z) * 0.01)))
             count += 1
 
     return points

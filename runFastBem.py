@@ -7,13 +7,13 @@ import shutil
 ROOT_DIR = os.path.dirname(__file__)
 
 
-def main(x: float, y: float, z: float) -> None:
+def main(x: float, y: float, z: float, monopole: bool) -> None:
     fastBem_input_path = "../FastBEM_Acoustics/input.dat"
     fastBem_exe_path = "C:/Users/tbashiyy/PycharmProjects/FastBem/FastBEM_Acoustics/FastBEM_Acoustics.bat"
     shape = 'quadrangular_prism'
     # x-off,y-off,z-off 回転は考慮しない
     # data作成
-    dataFile = createMesh.main(x, y, z)
+    dataFile = createMesh.main(x, y, z, monopole)
     dataFilePath = ROOT_DIR + "/output/{0}/{1}.dat".format(shape, dataFile)
     resultFilePath = "C:/Users/tbashiyy/PycharmProjects/FastBem/FastBEM_Acoustics/output_result.dat"
     resultMovedPathBase = ROOT_DIR + "/BemResults/{0}".format(shape)
@@ -33,4 +33,5 @@ def main(x: float, y: float, z: float) -> None:
         exit(1)
 
 
-main(-4, 0, -4)
+# main(x cm, y cm, zcm, monopole=True or False)
+main(0, 20, 5, False)
