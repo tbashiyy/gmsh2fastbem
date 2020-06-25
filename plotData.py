@@ -6,6 +6,7 @@ import os
 
 ROOT_DIR = os.path.dirname(__file__)
 
+
 def main(input_path: str, output_path: str, condition: Tuple[float, float, float, str]) -> None:
     fieldPoints = get_field_cells(input_path)
     pressure_scattered = get_pressure_scattered(output_path)
@@ -22,16 +23,8 @@ def main(input_path: str, output_path: str, condition: Tuple[float, float, float
     Z = ((z - min(z)) / max((z - min(z))) * 10).round(1).reshape(len(z), 1)
     XYZ = np.concatenate([X, Z, pressure], 1)
 
-    C = np.empty((11, 11))
-    C_p = np.empty((10, 10))
-
-    for point in XYZ:
-        C[int(point[0]), int(point[1])] = point[2]
-
-    for i in range(0, 10):
-        for j in range(0, 10):
-            # C_p[z, x]に変換
-            C_p[j, i] = np.sqrt(C[i, j]**2 + C[i+1, j]**2 + C[i, j+1]**2 + C[i+1, j+1]**2)*0.5
+    # C_p = get_default_pressure(XYZ)
+    C_p = get_thin_out_pressure(XYZ)
 
     plt.pcolor(C_p, cmap="Blues")
     cbar = plt.colorbar()
@@ -87,12 +80,54 @@ def get_pressure_scattered(path: str) -> List[List[float]]:
     return scatteredPressure
 
 
+def get_default_pressure(xyz):
+    C = np.empty((11, 11))
+    C_p = np.empty((10, 10))
+    for point in xyz:
+        C[int(point[0]), int(point[1])] = point[2]
+
+    for i in range(0, 10):
+        for j in range(0, 10):
+            # C_p[z, x]に変換
+            C_p[j, i] = np.sqrt(C[i, j] ** 2 + C[i + 1, j] ** 2 + C[i, j + 1] ** 2 + C[i + 1, j + 1] ** 2) * 0.5
+
+    print(C_p)
+    return C_p
+
+
+def get_thin_out_pressure(xyz):
+    C_p = np.empty((10, 10))
+    C_p_calculate = np.empty((10, 10))
+    C = np.empty((11, 11))
+
+    for point in xyz:
+        C[int(point[0]), int(point[1])] = point[2]
+
+    # まず、実際のセンサ部分の音圧を計算する
+    for i in range(0, 10):
+        for j in range(0, 10):
+            if (i + j) % 2 == 0:
+                C_p[j, i] = np.sqrt(C[i, j] ** 2 + C[i + 1, j] ** 2 + C[i, j + 1] ** 2 + C[i + 1, j + 1] ** 2) * 0.5
+            else:
+                C_p[j, i] = 0
+
+    for i in range(0, 10):
+        for j in range(0, 10):
+            if (i + j) % 2 == 0:
+                C_p_calculate[j, i] = C_p[j, i]
+            else:
+                C_p_calculate[j, i] = np.sqrt(C[j-1, i-1] ** 2 + C[j-1, i+1] ** 2 + C[j+1, i-1] ** 2 + C[j+1, i+1] ** 2) * 0.5
+
+    return C_p_calculate
+
+
+# Test
 def normTest() -> None:
     pressure_scattered = [[1, -5], [2, 3]]
     pressure = np.array(pressure_scattered)
     print(np.linalg.norm(pressure, axis=1))
 
 
-input_path = ROOT_DIR + "/BemResults/quadrangular_prism/input_(5,20,5).dat"
-output_path = ROOT_DIR + "/BemResults/quadrangular_prism/output_(5,20,5).dat"
-main(input_path, output_path, (5, 20, 5, "Plane Wave"))
+input_path_sample = ROOT_DIR + "/BemResults/quadrangular_prism/input_(5,20,5).dat"
+output_path_sample = ROOT_DIR + "/BemResults/quadrangular_prism/output_(5,20,5).dat"
+main(input_path_sample, output_path_sample, (5, 20, 5, "Plane Wave"))
