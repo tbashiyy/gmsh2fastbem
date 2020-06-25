@@ -2,17 +2,18 @@ from typing import *
 
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.linalg import norm
+import os
 
+ROOT_DIR = os.path.dirname(__file__)
 
-def main(input_path: str, output_path: str) -> None:
+def main(input_path: str, output_path: str, condition: Tuple[float, float, float, str]) -> None:
     fieldPoints = get_field_cells(input_path)
     pressure_scattered = get_pressure_scattered(output_path)
     if len(fieldPoints) != len(pressure_scattered):
         Exception('size is different')
 
     field = np.array(fieldPoints)
-    pressure = norm(np.array(pressure_scattered), axis=1).reshape(len(pressure_scattered), 1)
+    pressure = np.linalg.norm(np.array(pressure_scattered), axis=1).reshape(len(pressure_scattered), 1)
 
     x = field[:, 0]
     z = field[:, 2]
@@ -33,7 +34,11 @@ def main(input_path: str, output_path: str) -> None:
             C_p[j, i] = np.sqrt(C[i, j]**2 + C[i+1, j]**2 + C[i, j+1]**2 + C[i+1, j+1]**2)*0.5
 
     plt.pcolor(C_p, cmap="Blues")
-    plt.colorbar()
+    cbar = plt.colorbar()
+    cbar.set_label("[Pa]", rotation=360)
+    plt.xlabel("X")
+    plt.ylabel("Z")
+    plt.title("(x={0}, y={1}, z={2}) {3}".format(condition[0], condition[1], condition[2], condition[3]))
     plt.show()
     exit(0)
 
@@ -79,6 +84,15 @@ def get_pressure_scattered(path: str) -> List[List[float]]:
         splitData = line[99:124].split(',')
         scatteredPressure.append([float(splitData[0]), float(splitData[1])])
 
-    print(scatteredPressure)
     return scatteredPressure
 
+
+def normTest() -> None:
+    pressure_scattered = [[1, -5], [2, 3]]
+    pressure = np.array(pressure_scattered)
+    print(np.linalg.norm(pressure, axis=1))
+
+
+input_path = ROOT_DIR + "/BemResults/quadrangular_prism/input_(5,20,5).dat"
+output_path = ROOT_DIR + "/BemResults/quadrangular_prism/output_(5,20,5).dat"
+main(input_path, output_path, (5, 20, 5, "Plane Wave"))

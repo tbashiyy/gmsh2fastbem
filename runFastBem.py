@@ -27,11 +27,13 @@ def main(x: float, y: float, z: float, monopole: bool) -> None:
     if result.returncode == 0:
         output_path = shutil.move(resultFilePath, resultMovedPathBase + "/output_({0},{1},{2}).dat".format(x, y, z))
         input_path = shutil.move(fastBem_input_path, resultMovedPathBase + "/input_({0},{1},{2}).dat".format(x, y, z))
-        plotData.main(input_path, output_path)
+        sound_source = "Monopole" if monopole else "Plane Wave"
+        plotData.main(input_path, output_path, (x, y, z, sound_source))
         exit(0)
     else:
         exit(1)
 
 
+# 現在は回転考慮なし
 # main(x cm, y cm, zcm, monopole=True or False)
-main(0, 20, 5, False)
+main(5, 20, 5, False)
